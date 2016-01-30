@@ -6,14 +6,33 @@
 var express = require('express'),
   bodyParser = require('body-parser'),
   methodOverride = require('method-override'),
-  errorHandler = require('error-handler'),
+
+  // TypeError: Cannot read property 'domain' of undefined
+  // at Domain.add (domain.js:171:27)
+  // at errorHandler 
+  // Thus, the below code was discontinued:
+
+  // errorHandler = require('error-handler'),
+
+  // And substituded with the following:
+  errorHandler = require('errorhandler'),
+
   morgan = require('morgan'),
   routes = require('./routes'),
   api = require('./routes/api'),
   http = require('http'),
   path = require('path');
 
-var app = module.exports = express();
+// Most middleware (like errorHandler) is no longer bundled with Express 
+// and must be installed separately. Please see
+// https://github.com/senchalabs/connect#middleware.
+// Thus, the below code was discontinued:
+// var app = module.exports = express();
+
+// And substituded with the following:
+var app = express();
+//Middleware
+//app.listen(3000)
 
 
 /**
@@ -25,7 +44,19 @@ app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(morgan('dev'));
-app.use(bodyParser());
+
+// body-parser deprecated
+//		bodyParser: use individual json/urlencoded middlewares
+// 		undefined extended: provide extended option
+// Thus, the below code was discontinued:
+
+//app.use(bodyParser());
+
+// And substituded with the following:
+// configure body-parser
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+
 app.use(methodOverride());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -33,7 +64,15 @@ var env = process.env.NODE_ENV || 'development';
 
 // development only
 if (env === 'development') {
-  app.use(express.errorHandler());
+  // Most middleware (like errorHandler) is no longer bundled with Express 
+  // and must be installed separately. Please see
+  // https://github.com/senchalabs/connect#middleware.
+  // Thus, the below code was discontinued:
+  
+  // app.use(express.errorHandler());
+  
+  // And substituded with the following:
+  app.use(errorHandler());
 }
 
 // production only
